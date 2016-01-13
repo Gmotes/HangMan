@@ -63,6 +63,7 @@ public class MainActivity extends ActionBarActivity {
     ImageView w;
     ImageView y;
     ImageView z;
+    CountDownTimer timer;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,30 +124,33 @@ public class MainActivity extends ActionBarActivity {
 		
 		mTextField = (TextView) findViewById(R.id.mTextField);
 		
-		 new CountDownTimer(30000, 1000) {
-			
-			@Override
-			public void onTick(long millisUntilFinished) {
-				mTextField.setText("Seconds Remaining: " + millisUntilFinished / 1000);
-			}
-
-			@Override
-			public void onFinish() {
-				isGameFinished = true;
-				Toast.makeText(getApplicationContext(),"Time has finished!", Toast.LENGTH_LONG).show();
-				mistake = 0;
-				createNewGame();
-			}
-
-		}.start();
 		
 		
-		createNewGame();
+		createNewGame(true);
 		
 		
 	}
 	
-	public void createNewGame() {
+	public void createTimer() {
+	if (timer!=null)
+	 timer.cancel();
+	
+		timer = new CountDownTimer(30000, 1000) {
+
+		     public void onTick(long millisUntilFinished) {
+		         mTextField.setText("seconds remaining: " + millisUntilFinished / 1000);
+		     }
+
+		     public void onFinish() {
+		      isGameFinished = true;
+			  Toast.makeText(getApplicationContext(),"Time has finished!", Toast.LENGTH_LONG).show();
+			  mistake = 0;
+			  createNewGame(false);
+		     }
+		  }.start();
+	}
+	
+	public void createNewGame(boolean isNew) {
 		
 		isGameFinished = false;
 		
@@ -156,6 +160,20 @@ public class MainActivity extends ActionBarActivity {
 		String line;
 		Random r = new Random();
 	    int a  = r.nextInt(10);
+	    
+	    if (!isNew) {
+	    	LinearLayout layout = (LinearLayout) findViewById(R.id.blank_layout);
+	    	
+	    	for (int j=0;j<questionCount;j++) {
+	    		
+	    	ImageView view = (ImageView) findViewById(j);
+	    	layout.removeView(view);
+	    	
+	    		
+	    	}
+	    	
+	    }
+	    
 	    
 		try {
 
@@ -194,7 +212,7 @@ public class MainActivity extends ActionBarActivity {
 			e.printStackTrace();
 		}
 		
-		
+		 createTimer();
 		 makeVisibleCharacter();
 	}
 	
@@ -700,15 +718,14 @@ public class MainActivity extends ActionBarActivity {
 	       }
 	       
 	       boolean result = checkGameFinished();
-	       
-	       if (result) {
-	    	   
-	    		Toast.makeText(getApplicationContext(),"Tebrikler!", Toast.LENGTH_LONG).show();
-	       }
-	       else {
-	    	   
-	    	   Toast.makeText(getApplicationContext(),"Devam!", Toast.LENGTH_LONG).show(); 
-	       }
+	      
+	        if (result) {
+	        	
+	        	isGameFinished = true;
+	        	Toast.makeText(getApplicationContext(),"Tebrikler!", Toast.LENGTH_LONG).show();
+	        	
+	        	createNewGame(false);
+	        }
 	       
 	    }
 	       
@@ -749,7 +766,7 @@ public class MainActivity extends ActionBarActivity {
 	    		iv_new.setImageResource(R.drawable.e_hangman);	
 	    		isGameFinished = true;
 	    		mistake = 0;
-	    		createNewGame();
+	    		createNewGame(false);
 	    	}
     	
     	
@@ -773,4 +790,6 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+
 }
